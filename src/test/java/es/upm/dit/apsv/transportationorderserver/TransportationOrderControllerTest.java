@@ -53,8 +53,6 @@ public class TransportationOrderControllerTest {
                 .andExpect(jsonPath("$", hasSize(20)))
                 .andReturn();
     }
-
-    
     @Test
     public void testGetOrder() throws Exception {
         when(repository.findById("8962ZKR")).thenReturn(Optional.of(
@@ -64,27 +62,21 @@ public class TransportationOrderControllerTest {
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get("/transportationorders/8962ZKR")
-                .accept(MediaType.APPLICATION_JSON);
+                .accept(MediaType.APPLICATION_JSON);   
 
-        mockMvc.perform(request)
+                mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
+
+        RequestBuilder request2 = MockMvcRequestBuilders
+            .get("/transportationorders/ZZZZZZZZZZZZZ")
+            .accept(MediaType.APPLICATION_JSON);
+            mockMvc.perform(request2)
+            .andExpect(status().isNotFound())
+            .andReturn();
+
+
     }
-
-    
-    @Test
-    public void testGetOrderNotFound() throws Exception {
-        when(repository.findById("MISSING_ID")).thenReturn(Optional.empty());
-
-        RequestBuilder request = MockMvcRequestBuilders
-                .get("/transportationorders/MISSING_ID")
-                .accept(MediaType.APPLICATION_JSON);
-
-        mockMvc.perform(request)
-                .andExpect(status().isNotFound())
-                .andReturn();
-    }
-
     private List<TransportationOrder> getAllTestOrders() {
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayList<TransportationOrder> orders = new ArrayList<TransportationOrder>();
