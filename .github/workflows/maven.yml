@@ -82,4 +82,4 @@ jobs:
 
           push: true
 
-          tags: ghcr.io/andrescarrillorubinos/tos:latest
+          tags: ghcr.io/AndresCarrilloRubinos/tos:latest
