@@ -83,54 +83,51 @@ jobs:
           push: true
 
           tags: ghcr.io/andrescarrillorubinos/tos:latest
+  deploy:
+
+  needs: verify-and-package
+
+  runs-on: ubuntu-latest
+
+  permissions:
+
+    contents: 'read'
+
+    id-token: 'write'
 
 
+  steps:
 
-    deploy:
+  - uses: actions/checkout@v3
 
-    needs: verify-and-package
+  - id: 'auth'
 
-    runs-on: ubuntu-latest
+    uses: 'google-github-actions/auth@v1'
 
-    permissions:
+    with:
 
-      contents: 'read'
-
-      id-token: 'write'
-
-
-    steps:
-
-    - uses: actions/checkout@v3
-
-    - id: 'auth'
-
-      uses: 'google-github-actions/auth@v1'
-
-      with:
-
-        credentials_json: '${{ secrets.GCLOUD_SA }}'
+      credentials_json: '${{ secrets.GCLOUD_SA }}'
 
 
-    - id: 'get-credentials'
+  - id: 'get-credentials'
 
-      uses: 'google-github-actions/get-gke-credentials@v1'
+    uses: 'google-github-actions/get-gke-credentials@v1'
 
-      with:
+    with:
 
-        cluster_name: 'apsv-24'
+      cluster_name: 'apsv-24'
 
-        location: 'us-central1'
+      location: 'us-central1'
 
 
-    # The KUBECONFIG env var is automatically exported and picked up by kubectl.
+  # The KUBECONFIG env var is automatically exported and picked up by kubectl.
 
-    - id: 'deployment-mypod'
+  - id: 'deployment-mypod'
 
-      run: 'kubectl create secret docker-registry github-registry --docker-server="ghcr.io" --docker-username="AndresCarrilloRubinos" --docker-password="${{ secrets.PAT }}" --docker-email="acarrillorubinos@gmail.com" -o yaml --dry-run=client | kubectl apply -f -'
+    run: 'kubectl create secret docker-registry github-registry --docker-server="ghcr.io" --docker-username="AndresCarrilloRubinos" --docker-password="${{ secrets.PAT }}" --docker-email="acarrillorubinos@gmail.com" -o yaml --dry-run=client | kubectl apply -f -'
 
-    - run: 'kubectl apply -f deployment.yaml'
+  - run: 'kubectl apply -f deployment.yaml'
 
-    - run: 'kubectl get deployments'
+  - run: 'kubectl get deployments'
 
-    - run: 'kubectl get pods'
+  - run: 'kubectl get pods'
